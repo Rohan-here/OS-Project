@@ -45,6 +45,19 @@ function App() {
   const [searchString, setSearchString] = useState('')
   const filteredFiles = files.filter(s => s.name.startsWith(searchString))
 
+  // console.log(filteredFiles);
+
+  const deleteFile = (name) => {
+    console.log(name);
+    try {
+      fs.unlinkSync('./' + name);
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
+
   return (
     <div className="container mt-2">
       <h4>{path}</h4>
@@ -56,7 +69,7 @@ function App() {
           placeholder="File search"
         />
       </div>
-      <FilesViewer files={filteredFiles} onBack={onBack} onOpen={onOpen} />
+      <FilesViewer files={filteredFiles} onBack={onBack} onOpen={onOpen} deleteFile={deleteFile} />
     </div>
   )
 }
