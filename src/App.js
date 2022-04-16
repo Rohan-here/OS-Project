@@ -50,7 +50,8 @@ function App() {
   const deleteFile = (name) => {
     console.log(name);
     try {
-      fs.unlinkSync('./' + name);
+      console.log(pathModule.join(path + "/" + name));
+      fs.unlinkSync(pathModule.join(path + "/" + name));
     }
     catch (err) {
       console.log(err);
