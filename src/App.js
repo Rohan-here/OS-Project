@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { FilesViewer } from './FilesViewer'
 
 const fs = window.require('fs')
@@ -17,27 +17,47 @@ const formatSize = size => {
 
 function App() {
   const [path, setPath] = useState(app.getAppPath())
+  const [files, setFiles] = useState([]);
+  const [del, setDel] = useState(false);
+  // const files = useMemo(
+  //   () =>
+  //     fs
+  //       .readdirSync(path)
+  //       .map(file => {
+  //         const stats = fs.statSync(pathModule.join(path, file))
+  //         return {
+  //           name: file,
+  //           size: stats.isFile() ? formatSize(stats.size ?? 0) : null,
+  //           directory: stats.isDirectory()
+  //         }
+  //       })
+  //       .sort((a, b) => {
+  //         if (a.directory === b.directory) {
+  //           return a.name.localeCompare(b.name)
+  //         }
+  //         return a.directory ? -1 : 1
+  //       }),
+  //   [path]
+  // )
 
-  const files = useMemo(
-    () =>
-      fs
-        .readdirSync(path)
-        .map(file => {
-          const stats = fs.statSync(pathModule.join(path, file))
-          return {
-            name: file,
-            size: stats.isFile() ? formatSize(stats.size ?? 0) : null,
-            directory: stats.isDirectory()
-          }
-        })
-        .sort((a, b) => {
-          if (a.directory === b.directory) {
-            return a.name.localeCompare(b.name)
-          }
-          return a.directory ? -1 : 1
-        }),
-    [path]
-  )
+  useEffect(() =>
+    setFiles(fs
+      .readdirSync(path)
+      .map(file => {
+        const stats = fs.statSync(pathModule.join(path, file))
+        return {
+          name: file,
+          size: stats.isFile() ? formatSize(stats.size ?? 0) : null,
+          directory: stats.isDirectory()
+        }
+      })
+      .sort((a, b) => {
+        if (a.directory === b.directory) {
+          return a.name.localeCompare(b.name)
+        }
+        return a.directory ? -1 : 1
+      })),
+    [path, del])
 
   const onBack = () => setPath(pathModule.dirname(path))
   const onOpen = folder => setPath(pathModule.join(path, folder))
@@ -48,10 +68,11 @@ function App() {
   // console.log(filteredFiles);
 
   const deleteFile = (name) => {
-    console.log(name);
     try {
+      setDel(true);
       console.log(pathModule.join(path + "/" + name));
       fs.unlinkSync(pathModule.join(path + "/" + name));
+      setDel(false);
     }
     catch (err) {
       console.log(err);
